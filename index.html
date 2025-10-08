@@ -69,6 +69,11 @@
     footer { margin-top: 20px; text-align:center; color: var(--muted); font-size: 12px; }
     a { color: #93c5fd; }
   </style>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#22c55e">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+
 </head>
 <body>
   <div class="container">
@@ -137,6 +142,11 @@
         <p><a href="#" id="new">Enviar outra resposta</a></p>
       </div>
       <footer>© App de Satisfação – simples e anônimo.</footer>
+
+      <button id="installBtn" style="display:none;margin-top:10px;border:1px solid var(--border);background:#0b1220;padding:10px 12px;border-radius:12px;color:var(--text);width:100%;">
+        Instalar no celular
+      </button>
+
     </div>
   </div>
 
@@ -247,6 +257,29 @@
         submitBtn.disabled = false;
       }
     });
-  </script>
+  
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(console.error);
+    });
+  }
+  // A2HS
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block';
+  });
+  installBtn?.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+    // console.log('A2HS choice', choice.outcome);
+  });
+
+</script>
 </body>
 </html>
