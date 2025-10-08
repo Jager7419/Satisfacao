@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Avalie seu atendimento e o serviço prestado</title>
+  <meta name="description" content="Pesquisa rápida e anônima de satisfação do cliente." />
+  <style>
+    :root {
+      --bg: #0f172a;          /* Slate-900 */
+      --card: #111827;        /* Gray-900 */
+      --text: #e5e7eb;        /* Gray-200 */
+      --muted: #9ca3af;       /* Gray-400 */
+      --accent: #22c55e;      /* Green-500 */
+      --danger: #ef4444;      /* Red-500 */
+      --border: #1f2937;      /* Gray-800 */
+      --focus: #60a5fa;       /* Blue-400 */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 70% -100px, #1f2937 0%, var(--bg) 60%);
+      color: var(--text);
+    }
+    .container { max-width: 760px; margin: 0 auto; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      backdrop-filter: blur(6px);
+    }
+    h1 { font-size: clamp(1.25rem, 2vw, 1.6rem); margin: 0 0 12px; }
+    p.desc { margin: 0 0 16px; color: var(--muted); }
+    label { display: block; margin: 16px 0 8px; font-weight: 600; }
+    select, textarea, button {
+      width: 100%; border-radius: 12px; border: 1px solid var(--border); background: #0b1220; color: var(--text);
+      padding: 12px 14px; font-size: 15px;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 720px) { .row.two { grid-template-columns: 1fr 1fr; } }
+
+    .group { margin: 10px 0 18px; }
+    .group-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .hint { font-size: 12px; color: var(--muted); }
+
+    .emoji-row { display:flex; gap: 10px; justify-content: space-between; }
+    .emoji {
+      appearance: none; border: 1px solid var(--border); background: #0b1220; color: #fff; cursor: pointer;
+      font-size: 26px; line-height: 1; width: 58px; height: 58px; border-radius: 50%;
+      display:flex; align-items:center; justify-content:center; transition: transform .08s ease, border-color .08s ease, box-shadow .08s ease;
+    }
+    .emoji:hover { transform: translateY(-2px); border-color: #334155; }
+    .emoji[aria-checked="true"], .emoji.selected {
+      outline: 2px solid var(--focus); box-shadow: 0 0 0 4px rgba(96,165,250,.15);
+    }
+
+    .actions { display:flex; gap: 12px; align-items:center; margin-top: 8px; }
+    .submit {
+      background: linear-gradient(180deg, #1ea94b, #169a42); border: none; font-weight: 700; letter-spacing: .2px;
+      display:inline-flex; align-items:center; justify-content:center; gap:10px; padding: 14px 16px;
+    }
+    .submit[disabled] { opacity:.6; cursor:not-allowed; }
+    .privacy { font-size: 12px; color: var(--muted); }
+    .success {
+      text-align:center; padding: 32px; border: 1px solid var(--border); border-radius: 16px; background: #0b1220; margin-top: 14px;
+    }
+    .success h2 { margin: 0 0 8px; }
+    footer { margin-top: 20px; text-align:center; color: var(--muted); font-size: 12px; }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="card">
+      <h1>Avalie seu atendimento e o serviço prestado</h1>
+      <p class="desc">Sua resposta é anônima e leva menos de 15 segundos.</p>
+
+      <form id="form" novalidate>
+        <label for="colaborador">Quem te atendeu?</label>
+        <select id="colaborador" name="colaborador" required>
+          <option value="" selected disabled>Selecione o colaborador</option>
+          <option>Lucas</option>
+          <option>Jose</option>
+          <option>Marcos</option>
+          <option>Gabriel</option>
+        </select>
+
+        <div class="group" id="grp-atendimento">
+          <div class="group-title">
+            <label>Avalie o <strong>atendimento</strong></label>
+            <span class="hint" id="hint-at">Toque em um emoji</span>
+          </div>
+          <div class="emoji-row" role="radiogroup" aria-label="Avaliação do atendimento">
+            <button type="button" class="emoji" data-field="atendimento" data-value="1" aria-checked="false" aria-label="Muito insatisfeito">😡</button>
+            <button type="button" class="emoji" data-field="atendimento" data-value="2" aria-checked="false" aria-label="Insatisfeito">😟</button>
+            <button type="button" class="emoji" data-field="atendimento" data-value="3" aria-checked="false" aria-label="Neutro">😐</button>
+            <button type="button" class="emoji" data-field="atendimento" data-value="4" aria-checked="false" aria-label="Satisfeito">🙂</button>
+            <button type="button" class="emoji" data-field="atendimento" data-value="5" aria-checked="false" aria-label="Muito satisfeito">😄</button>
+          </div>
+        </div>
+
+        <div class="group" id="grp-servico">
+          <div class="group-title">
+            <label>Avalie o <strong>serviço</strong></label>
+            <span class="hint" id="hint-se">Toque em um emoji</span>
+          </div>
+          <div class="emoji-row" role="radiogroup" aria-label="Avaliação do serviço">
+            <button type="button" class="emoji" data-field="servico" data-value="1" aria-checked="false" aria-label="Muito insatisfeito">😡</button>
+            <button type="button" class="emoji" data-field="servico" data-value="2" aria-checked="false" aria-label="Insatisfeito">😟</button>
+            <button type="button" class="emoji" data-field="servico" data-value="3" aria-checked="false" aria-label="Neutro">😐</button>
+            <button type="button" class="emoji" data-field="servico" data-value="4" aria-checked="false" aria-label="Satisfeito">🙂</button>
+            <button type="button" class="emoji" data-field="servico" data-value="5" aria-checked="false" aria-label="Muito satisfeito">😄</button>
+          </div>
+        </div>
+
+        <div class="row two">
+          <div>
+            <label for="sug_atendimento">Sugestões de melhoria do atendimento (opcional)</label>
+            <textarea id="sug_atendimento" name="sug_atendimento" placeholder="Conte como podemos melhorar o atendimento..."></textarea>
+          </div>
+          <div>
+            <label for="sug_servico">Sugestões de melhoria do serviço (opcional)</label>
+            <textarea id="sug_servico" name="sug_servico" placeholder="Conte como podemos melhorar o serviço..."></textarea>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="submit" id="submit" type="submit">Enviar anonimamente</button>
+          <span class="privacy">Não coletamos nome, e‑mail ou telefone.</span>
+        </div>
+      </form>
+
+      <div id="success" class="success" style="display:none;">
+        <h2>✅ Obrigado!</h2>
+        <p>Recebemos sua avaliação. Ela ajuda a melhorar nosso atendimento e serviço.</p>
+        <p><a href="#" id="new">Enviar outra resposta</a></p>
+      </div>
+      <footer>© App de Satisfação – simples e anônimo.</footer>
+    </div>
+  </div>
+
+  <script>
+    // 1) CONFIGURE sua URL do Apps Script (implante como Web App e copie o link /exec)
+    // >>> TROQUE PELO LINK DO SEU APPS SCRIPT WEB APP (termina com /exec)
+    const APPS_SCRIPT_URL = "COLE_AQUI_A_SUA_URL_DO_WEB_APP";
+
+    const state = { atendimento: 0, servico: 0 };
+
+    function selectEmoji(field, value, btn) {
+      state[field] = value;
+      const group = btn.parentElement; // .emoji-row
+      group.querySelectorAll('.emoji').forEach(el => {
+        el.classList.remove('selected');
+        el.setAttribute('aria-checked','false');
+      });
+      btn.classList.add('selected');
+      btn.setAttribute('aria-checked','true');
+      document.getElementById(field === 'atendimento' ? 'hint-at' : 'hint-se').textContent = `Nota: ${value}/5`;
+      validateReady();
+    }
+
+    document.querySelectorAll('.emoji').forEach(btn => {
+      btn.addEventListener('click', () => selectEmoji(btn.dataset.field, Number(btn.dataset.value), btn));
+      btn.addEventListener('keydown', (e) => {
+        // acessibilidade básica com setas
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          const group = btn.parentElement;
+          const items = Array.from(group.querySelectorAll('.emoji'));
+          const idx = items.indexOf(btn);
+          const next = e.key === 'ArrowRight' ? Math.min(idx+1, items.length-1) : Math.max(idx-1, 0);
+          items[next].focus();
+        }
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+
+    const form = document.getElementById('form');
+    const submitBtn = document.getElementById('submit');
+
+    function validateReady() {
+      const colabOK = document.getElementById('colaborador').value !== '';
+      const scoresOK = state.atendimento > 0 && state.servico > 0;
+      submitBtn.disabled = !(colabOK && scoresOK);
+    }
+
+    document.getElementById('colaborador').addEventListener('change', validateReady);
+    validateReady();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      validateReady();
+      if (submitBtn.disabled) return;
+
+      submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Enviando...';
+
+      const data = new URLSearchParams();
+      data.append('colaborador', document.getElementById('colaborador').value);
+      data.append('atendimento_rating', String(state.atendimento));
+      data.append('servico_rating', String(state.servico));
+      data.append('sug_atendimento', document.getElementById('sug_atendimento').value.trim());
+      data.append('sug_servico', document.getElementById('sug_servico').value.trim());
+      data.append('ua', navigator.userAgent);
+      data.append('pageUrl', location.href);
+      data.append('tz', Intl.DateTimeFormat().resolvedOptions().timeZone || '');
+
+      try {
+        const resp = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: data.toString()
+        });
+        let ok = resp.ok;
+        try {
+          const js = await resp.json();
+          ok = ok && (js.ok === true || js.status === 'success');
+        } catch (_) {}
+        if (ok) {
+          document.getElementById('form').style.display = 'none';
+          document.getElementById('success').style.display = 'block';
+          document.getElementById('new').addEventListener('click', (ev) => {
+            ev.preventDefault();
+            // reset simples
+            document.getElementById('form').reset();
+            state.atendimento = 0; state.servico = 0;
+            document.querySelectorAll('.emoji.selected').forEach(b=>b.classList.remove('selected'));
+            document.querySelectorAll('.emoji').forEach(b=>b.setAttribute('aria-checked','false'));
+            document.getElementById('hint-at').textContent = 'Toque em um emoji';
+            document.getElementById('hint-se').textContent = 'Toque em um emoji';
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('form').style.display = 'block';
+            validateReady();
+          }, { once: true });
+        } else {
+          alert('Não foi possível enviar agora. Tente novamente em instantes.');
+        }
+      } catch (err) {
+        alert('Erro de conexão. Verifique a internet e tente novamente.');
+        console.error(err);
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
