@@ -1,5 +1,5 @@
 /** CONFIGURAÇÃO **/
-const SHEET_ID = 'COLE_AQUI_O_ID_DA_SUA_PLANILHA';
+const SHEET_ID = '1L8gfo_ceImSRrYtkm1O7vT9RjmYv0TSMc0jPqIU28RM';
 const SHEET_NAME = 'Respostas';
 
 /** Util: garante a aba e o cabeçalho **/
