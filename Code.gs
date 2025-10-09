@@ -1,5 +1,5 @@
 /** CONFIGURAÇÃO **/
-const SHEET_ID = '1L8gfo_ceImSRrYtkm1O7vT9RjmYv0TSMc0jPqIU28RM';
+const SHEET_ID = 'COLE_AQUI_O_ID_DA_SUA_PLANILHA';
 const SHEET_NAME = 'Respostas';
 
 /** Util: garante a aba e o cabeçalho **/
@@ -9,16 +9,14 @@ function getSheet_() {
   if (!sh) sh = ss.insertSheet(SHEET_NAME);
   if (sh.getLastRow() === 0) {
     sh.appendRow([
-      'timestamp', 'colaborador',
-      'atendimento_rating', 'servico_rating',
-      'sug_atendimento', 'sug_servico',
+      'timestamp', 'colaborador', 'dav',
+      'atendimento_rating', 'sug_atendimento',
       'user_agent', 'page_url', 'timezone'
     ]);
   }
   return sh;
 }
 
-/** Ping opcional **/
 function doGet() {
   return ContentService
     .createTextOutput(JSON.stringify({ ok: true, ping: new Date().toISOString() }))
@@ -32,10 +30,9 @@ function doPost(e) {
     const row = [
       new Date(),
       (p.colaborador || '').toString(),
+      (p.dav || p.davos || p.dav_os || '').toString(),
       Number(p.atendimento_rating || 0),
-      Number(p.servico_rating || 0),
       (p.sug_atendimento || '').toString(),
-      (p.sug_servico || '').toString(),
       (p.ua || '').toString(),
       (p.pageUrl || '').toString(),
       (p.tz || '').toString()
