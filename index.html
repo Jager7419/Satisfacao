@@ -93,7 +93,7 @@
           </div>
           <div>
             <label for="dav">Número DAV/DAVOS</label>
-            <input id="dav" name="dav" type="text" placeholder="ex.: DAV12345" maxlength="30" autocomplete="off" />
+            <input id="dav" name="dav" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="ex.: 12345 (somente números)" maxlength="20" autocomplete="off" />
           </div>
         </div>
 
@@ -255,6 +255,16 @@
         submitBtn.disabled = false;
       }
     });
-  </script>
+  
+    // força somente dígitos no DAV
+    const davInput = document.getElementById('dav');
+    if (davInput) {
+      davInput.addEventListener('input', () => {
+        const v = davInput.value.replace(/\D+/g, '');
+        if (davInput.value !== v) davInput.value = v;
+      });
+    }
+    
+</script>
 </body>
 </html>
