@@ -8,79 +8,65 @@
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#22c55e">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
+
+  <!-- QRCode lib (MIT) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+
   <style>
     :root {
-      --bg: #0f172a;          /* Slate-900 */
-      --card: #111827;        /* Gray-900 */
-      --text: #e5e7eb;        /* Gray-200 */
-      --muted: #9ca3af;       /* Gray-400 */
-      --accent: #22c55e;      /* Green-500 */
-      --danger: #ef4444;      /* Red-500 */
-      --border: #1f2937;      /* Gray-800 */
-      --focus: #60a5fa;       /* Blue-400 */
+      --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#9ca3af;
+      --accent:#22c55e; --danger:#ef4444; --border:#1f2937; --focus:#60a5fa;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 24px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
-      background: radial-gradient(1200px 600px at 70% -100px, #1f2937 0%, var(--bg) 60%);
-      color: var(--text);
+    *{box-sizing:border-box;}
+    body{margin:0;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;background:var(--bg);color:var(--text)}
+    .container{max-width:760px;margin:0 auto}
+    .card{background:#0b1220;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+    h1{font-size:clamp(1.25rem,2vw,1.6rem);margin:0 0 12px}
+    p.desc{margin:0 0 16px;color:var(--muted)}
+    label{display:block;margin:16px 0 8px;font-weight:600}
+    input[type="text"],select,textarea,button{
+      width:100%;border-radius:12px;border:1px solid var(--border);background:#0b1220;color:var(--text);padding:12px 14px;font-size:15px
     }
-    .container { max-width: 760px; margin: 0 auto; }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border: 1px solid var(--border);
-      border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-      backdrop-filter: blur(6px);
+    textarea{min-height:90px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:720px){.row.two{grid-template-columns:1fr 1fr}}
+    .group{margin:10px 0 18px}
+    .group-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .hint{font-size:12px;color:var(--muted)}
+    .emoji-row{display:flex;gap:10px;justify-content:space-between}
+    .emoji{
+      appearance:none;border:1px solid var(--border);background:#0b1220;color:#fff;cursor:pointer;
+      font-size:26px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center
     }
-    h1 { font-size: clamp(1.25rem, 2vw, 1.6rem); margin: 0 0 12px; }
-    p.desc { margin: 0 0 16px; color: var(--muted); }
-    label { display: block; margin: 16px 0 8px; font-weight: 600; }
-    input[type="text"], select, textarea, button {
-      width: 100%; border-radius: 12px; border: 1px solid var(--border); background: #0b1220; color: var(--text);
-      padding: 12px 14px; font-size: 15px;
-    }
-    textarea { min-height: 90px; resize: vertical; }
-    .row { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 720px) { .row.two { grid-template-columns: 1fr 1fr; } }
-
-    .group { margin: 10px 0 18px; }
-    .group-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-    .hint { font-size: 12px; color: var(--muted); }
-
-    .emoji-row { display:flex; gap: 10px; justify-content: space-between; }
-    .emoji {
-      appearance: none; border: 1px solid var(--border); background: #0b1220; color: #fff; cursor: pointer;
-      font-size: 26px; line-height: 1; width: 58px; height: 58px; border-radius: 50%;
-      display:flex; align-items:center; justify-content:center; transition: transform .08s ease, border-color .08s ease, box-shadow .08s ease;
-    }
-    .emoji:hover { transform: translateY(-2px); border-color: #334155; }
-    .emoji[aria-checked="true"], .emoji.selected {
-      outline: 2px solid var(--focus); box-shadow: 0 0 0 4px rgba(96,165,250,.15);
-    }
-
-    .actions { display:flex; gap: 12px; align-items:center; margin-top: 8px; flex-wrap: wrap; }
-    .submit {
-      background: linear-gradient(180deg, #1ea94b, #169a42); border: none; font-weight: 700; letter-spacing: .2px;
-      display:inline-flex; align-items:center; justify-content:center; gap:10px; padding: 14px 16px;
-    }
-    .submit[disabled] { opacity:.6; cursor:not-allowed; }
-    .privacy { font-size: 12px; color: var(--muted); }
-    .success {
-      text-align:center; padding: 32px; border: 1px solid var(--border); border-radius: 16px; background: #0b1220; margin-top: 14px;
-    }
-    .success h2 { margin: 0 0 8px; }
-    footer { margin-top: 20px; text-align:center; color: var(--muted); font-size: 12px; width:100%; }
-    a { color: #93c5fd; }
+    .emoji.selected,.emoji[aria-checked="true"]{outline:2px solid var(--focus);box-shadow:0 0 0 4px rgba(96,165,250,.15)}
+    .actions{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap}
+    .submit{background:linear-gradient(180deg,#1ea94b,#169a42);border:none;font-weight:700;padding:14px 16px}
+    .submit[disabled]{opacity:.6;cursor:not-allowed}
+    .privacy{font-size:12px;color:var(--muted)}
+    .success{padding:32px;text-align:center;border:1px solid var(--border);border-radius:16px;background:#0b1220;margin-top:14px}
+    footer{margin-top:20px;text-align:center;color:var(--muted);font-size:12px;width:100%}
+    .vendor-tools{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 4px}
+    .btn-outline{border:1px solid var(--border);background:#0b1220;padding:12px 14px;border-radius:12px;color:var(--text);cursor:pointer}
+    .banner{background:#0b2a1a;border:1px solid #134e31;border-radius:12px;padding:10px 12px;margin:8px 0 0;color:#b7f7d0;font-size:14px}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0b1220;border:1px solid var(--border);color:#e5e7eb;padding:10px 14px;border-radius:10px;display:none}
+    /* Modal QR */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
+    .modal .box{background:#0b1220;border:1px solid var(--border);border-radius:16px;padding:18px;width:min(92vw,420px)}
+    .modal .qr{display:flex;align-items:center;justify-content:center;padding:16px;background:#0b1220;border-radius:12px;border:1px dashed #334155}
+    .modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card" id="card">
       <h1>Avalie seu atendimento</h1>
-      <p class="desc">Sua resposta é anônima e leva menos de 15 segundos.</p>
+      <p class="desc">Vendedor: selecione seu nome e o DAV. Gere o QR ou link para o cliente avaliar.</p>
+
+      <div id="contextBanner" class="banner" style="display:none;"></div>
 
       <form id="form" novalidate>
-        <div class="row two">
+        <!-- Área do vendedor -->
+        <div class="row two" id="vendorRow">
           <div>
             <label for="colaborador">Quem te atendeu?</label>
             <select id="colaborador" name="colaborador" required>
@@ -93,10 +79,17 @@
           </div>
           <div>
             <label for="dav">Número DAV/DAVOS</label>
-            <input id="dav" name="dav" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="ex.: 12345 (somente números)" maxlength="20" autocomplete="off" />
+            <input id="dav" name="dav" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="ex.: 12345 (somente números)" maxlength="20" autocomplete="off" required />
           </div>
         </div>
 
+        <!-- Ferramentas: gerar QR / link -->
+        <div id="vendorTools" class="vendor-tools">
+          <button type="button" class="btn-outline" id="btnQR">Gerar QR Code</button>
+          <button type="button" class="btn-outline" id="btnLink">Copiar link</button>
+        </div>
+
+        <!-- Área do cliente (avaliação) -->
         <div class="group" id="grp-atendimento">
           <div class="group-title">
             <label>Avalie o <strong>atendimento</strong></label>
@@ -118,8 +111,8 @@
 
         <div class="actions">
           <button class="submit" id="submit" type="submit">Enviar anonimamente</button>
-          <span class="privacy">Não coletamos nome, e‑mail ou telefone.</span>
-          <button id="installBtn" type="button" style="display:none;border:1px solid var(--border);background:#0b1220;padding:10px 12px;border-radius:12px;color:var(--text);">Instalar no celular</button>
+          <span class="privacy">Não coletamos nome, e-mail ou telefone.</span>
+          <button id="installBtn" type="button" class="btn-outline" style="display:none;">Instalar no celular</button>
           <footer>© App de Satisfação – simples e anônimo.</footer>
         </div>
       </form>
@@ -132,55 +125,62 @@
     </div>
   </div>
 
+  <!-- Modal do QR -->
+  <div id="qrModal" class="modal" aria-hidden="true">
+    <div class="box">
+      <h3>Escaneie o QR code</h3>
+      <div id="qrContainer" class="qr"></div>
+      <p id="qrLinkText" style="word-break:break-all;font-size:12px;color:#9ca3af;margin:8px 0 0;"></p>
+      <div class="row">
+        <button type="button" class="btn-outline" id="btnPrint">Imprimir</button>
+        <button type="button" class="submit" id="btnCloseQR">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Link copiado!</div>
+
   <script>
-    // >>> TROQUE PELO LINK DO SEU APPS SCRIPT WEB APP (termina com /exec)
+    // COLE AQUI sua URL /exec do Apps Script:
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwKckYUBdIt3Sv4uY7DUxEK0KCzWpeItHv_TEwuXNZzWmjgYLwxh4-j2OjJfyOqikAH2w/exec";
 
+    // Estado da avaliação
     const state = { atendimento: 0 };
 
+    // Seleção de emoji
     function selectEmoji(field, value, btn) {
       state[field] = value;
       const group = btn.parentElement;
       group.querySelectorAll('.emoji').forEach(el => {
-        el.classList.remove('selected');
-        el.setAttribute('aria-checked','false');
+        el.classList.remove('selected'); el.setAttribute('aria-checked','false');
       });
-      btn.classList.add('selected');
-      btn.setAttribute('aria-checked','true');
+      btn.classList.add('selected'); btn.setAttribute('aria-checked','true');
       document.getElementById('hint-at').textContent = `Nota: ${value}/5`;
       validateReady();
     }
-
     document.querySelectorAll('.emoji').forEach(btn => {
       btn.addEventListener('click', () => selectEmoji(btn.dataset.field, Number(btn.dataset.value), btn));
-      btn.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-          const group = btn.parentElement;
-          const items = Array.from(group.querySelectorAll('.emoji'));
-          const idx = items.indexOf(btn);
-          const next = e.key === 'ArrowRight' ? Math.min(idx+1, items.length-1) : Math.max(idx-1, 0);
-          items[next].focus();
-        }
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          btn.click();
-        }
-      });
     });
 
-    const form = document.getElementById('form');
+    // Habilitar/desabilitar botões
     const submitBtn = document.getElementById('submit');
-
     function validateReady() {
       const colabOK = document.getElementById('colaborador').value !== '';
       const scoreOK = state.atendimento > 0;
+      const davOK = document.getElementById('dav').value.trim() !== '';
       submitBtn.disabled = !(colabOK && scoreOK);
+      document.getElementById('btnQR').disabled = !(colabOK && davOK);
+      document.getElementById('btnLink').disabled = !(colabOK && davOK);
     }
-
     document.getElementById('colaborador').addEventListener('change', validateReady);
+    const davInput = document.getElementById('dav');
+    davInput.addEventListener('input', () => {
+      davInput.value = davInput.value.replace(/\D+/g, ''); // só dígitos
+      validateReady();
+    });
     validateReady();
 
-    // Service worker register + A2HS install prompt
+    // PWA install
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(console.error);
@@ -189,26 +189,92 @@
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'inline-flex';
+      e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'inline-flex';
     });
     installBtn?.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.style.display = 'none';
+      if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; installBtn.style.display='none';
     });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      validateReady();
-      if (submitBtn.disabled) return;
+    // Monta link com ?c=<colaborador>&dav=<n>
+    function buildShareLink() {
+      const base = new URL(location.href);
+      base.search = ''; // limpa params anteriores
+      const col = document.getElementById('colaborador').value;
+      const dav = document.getElementById('dav').value.trim();
+      if (col) base.searchParams.set('c', col);
+      if (dav) base.searchParams.set('dav', dav);
+      return base.toString();
+    }
 
-      submitBtn.disabled = true;
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Enviando...';
+    // Botões de vendedor
+    const toast = document.getElementById('toast');
+    function showToast(msg){ toast.textContent=msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none',1800); }
+
+    document.getElementById('btnLink').addEventListener('click', async () => {
+      const link = buildShareLink();
+      try { await navigator.clipboard.writeText(link); showToast('Link copiado!'); }
+      catch { showToast('Copie manualmente: ' + link); }
+      // Web Share API (opcional)
+      if (navigator.share) {
+        try { await navigator.share({ title: 'Avalie seu atendimento', url: link }); } catch {}
+      }
+    });
+
+    const qrModal = document.getElementById('qrModal');
+    const qrContainer = document.getElementById('qrContainer');
+    const qrLinkText = document.getElementById('qrLinkText');
+
+    document.getElementById('btnQR').addEventListener('click', () => {
+      const link = buildShareLink();
+      qrContainer.innerHTML = '';
+      // gera QR (tamanho 256px aprox)
+      const qr = new QRCode(qrContainer, { text: link, width: 256, height: 256 });
+      qrLinkText.textContent = link;
+      qrModal.style.display = 'flex'; qrModal.setAttribute('aria-hidden','false');
+    });
+    document.getElementById('btnCloseQR').addEventListener('click', () => {
+      qrModal.style.display = 'none'; qrModal.setAttribute('aria-hidden','true');
+      qrContainer.innerHTML = '';
+    });
+    document.getElementById('btnPrint').addEventListener('click', () => {
+      const img = qrContainer.querySelector('img,canvas');
+      const w = window.open('', '_blank');
+      w.document.write('<html><head><title>QR Code</title></head><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui,sans-serif">');
+      w.document.write('<div style="text-align:center">');
+      if (img) w.document.write(img.outerHTML);
+      w.document.write('<p style="margin-top:10px;font-size:14px;">'+qrLinkText.textContent+'</p>');
+      w.document.write('</div></body></html>');
+      w.document.close(); w.focus(); w.print();
+    });
+
+    // Modo cliente: se veio com ?c= & dav= na URL, pré-preenche e trava os campos; esconde as ferramentas do vendedor
+    (function prefillFromParams(){
+      const params = new URLSearchParams(location.search);
+      const col = params.get('c') || params.get('colaborador');
+      const dav = params.get('dav');
+      let banner = [];
+      if (col) {
+        const sel = document.getElementById('colaborador');
+        [...sel.options].forEach(o => { if (o.text.toLowerCase() === col.toLowerCase()) o.selected = true; });
+        sel.disabled = true; banner.push('Colaborador: ' + col);
+      }
+      if (dav) {
+        davInput.value = (dav+'').replace(/\D+/g,'');
+        davInput.readOnly = true; banner.push('DAV: ' + davInput.value);
+      }
+      if (banner.length) {
+        document.getElementById('contextBanner').textContent = 'Você está avaliando: ' + banner.join(' • ');
+        document.getElementById('contextBanner').style.display = 'block';
+        document.getElementById('vendorTools').style.display = 'none';
+      }
+      validateReady();
+    })();
+
+    // Envio (igual antes)
+    const form = document.getElementById('form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault(); validateReady(); if (submitBtn.disabled) return;
+      const originalText = submitBtn.textContent; submitBtn.disabled = true; submitBtn.textContent = 'Enviando...';
 
       const data = new URLSearchParams();
       data.append('colaborador', document.getElementById('colaborador').value);
@@ -221,50 +287,46 @@
 
       try {
         const resp = await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body: data.toString()
+          method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+          body:data.toString()
         });
-        let ok = resp.ok;
-        try {
-          const js = await resp.json();
-          ok = ok && (js.ok === true || js.status === 'success');
-        } catch (_) {}
+        const status = resp.status; let raw = await resp.text(); let ok = resp.ok, js = {};
+        try { js = JSON.parse(raw); ok = ok && (js.ok === true || js.status === 'success'); } catch {}
         if (ok) {
           document.getElementById('form').style.display = 'none';
           document.getElementById('success').style.display = 'block';
           document.getElementById('new').addEventListener('click', (ev) => {
             ev.preventDefault();
-            document.getElementById('form').reset();
-            state.atendimento = 0;
+            document.getElementById('form').reset(); state.atendimento = 0;
             document.querySelectorAll('.emoji.selected').forEach(b=>b.classList.remove('selected'));
             document.querySelectorAll('.emoji').forEach(b=>b.setAttribute('aria-checked','false'));
             document.getElementById('hint-at').textContent = 'Toque em um emoji';
             document.getElementById('success').style.display = 'none';
             document.getElementById('form').style.display = 'block';
+            // reexibe ferramentas do vendedor só se não houver ?c&dav
+            if (!new URLSearchParams(location.search).has('c') && !new URLSearchParams(location.search).has('dav')) {
+              document.getElementById('vendorTools').style.display = 'flex';
+              document.getElementById('contextBanner').style.display = 'none';
+              document.getElementById('colaborador').disabled = false;
+              document.getElementById('dav').readOnly = false;
+            }
             validateReady();
           }, { once: true });
         } else {
-          alert('Não foi possível enviar agora. Tente novamente em instantes.');
+          if (js && (js.code === 'DUPLICATE_DAV' || /DAV.*avaliad/i.test(js.error||''))) {
+            alert('Este número DAV/DAVOS já foi avaliado. Obrigado!');
+          } else {
+            alert(`Não foi possível enviar. (HTTP ${status})` + (js.error ? `\nErro do servidor: ${js.error}` : ''));
+            console.log('Apps Script resposta:', status, raw);
+          }
         }
       } catch (err) {
         alert('Erro de conexão. Verifique a internet e tente novamente.');
         console.error(err);
       } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
+        submitBtn.textContent = originalText; submitBtn.disabled = false;
       }
     });
-  
-    // força somente dígitos no DAV
-    const davInput = document.getElementById('dav');
-    if (davInput) {
-      davInput.addEventListener('input', () => {
-        const v = davInput.value.replace(/\D+/g, '');
-        if (davInput.value !== v) davInput.value = v;
-      });
-    }
-    
-</script>
+  </script>
 </body>
 </html>
