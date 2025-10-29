@@ -1,332 +1,86 @@
-<!doctype html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html>
 <head>
+  <base target="_top">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Avalie seu atendimento</title>
-  <meta name="description" content="Pesquisa rápida e anônima de satisfação do atendimento." />
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#22c55e">
-  <link rel="apple-touch-icon" href="icons/icon-180.png">
-
-  <!-- QRCode lib (MIT) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
-
+  <title>Gerar link/QR</title>
   <style>
-    :root {
-      --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#9ca3af;
-      --accent:#22c55e; --danger:#ef4444; --border:#1f2937; --focus:#60a5fa;
-    }
-    *{box-sizing:border-box;}
-    body{margin:0;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;background:var(--bg);color:var(--text)}
-    .container{max-width:760px;margin:0 auto}
-    .card{background:#0b1220;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
-    h1{font-size:clamp(1.25rem,2vw,1.6rem);margin:0 0 12px}
-    p.desc{margin:0 0 16px;color:var(--muted)}
-    label{display:block;margin:16px 0 8px;font-weight:600}
-    input[type="text"],select,textarea,button{
-      width:100%;border-radius:12px;border:1px solid var(--border);background:#0b1220;color:var(--text);padding:12px 14px;font-size:15px
-    }
-    textarea{min-height:90px;resize:vertical}
-    .row{display:grid;grid-template-columns:1fr;gap:16px}
-    @media(min-width:720px){.row.two{grid-template-columns:1fr 1fr}}
-    .group{margin:10px 0 18px}
-    .group-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-    .hint{font-size:12px;color:var(--muted)}
-    .emoji-row{display:flex;gap:10px;justify-content:space-between}
-    .emoji{
-      appearance:none;border:1px solid var(--border);background:#0b1220;color:#fff;cursor:pointer;
-      font-size:26px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center
-    }
-    .emoji.selected,.emoji[aria-checked="true"]{outline:2px solid var(--focus);box-shadow:0 0 0 4px rgba(96,165,250,.15)}
-    .actions{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap}
-    .submit{background:linear-gradient(180deg,#1ea94b,#169a42);border:none;font-weight:700;padding:14px 16px}
-    .submit[disabled]{opacity:.6;cursor:not-allowed}
-    .privacy{font-size:12px;color:var(--muted)}
-    .success{padding:32px;text-align:center;border:1px solid var(--border);border-radius:16px;background:#0b1220;margin-top:14px}
-    footer{margin-top:20px;text-align:center;color:var(--muted);font-size:12px;width:100%}
-    .vendor-tools{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 4px}
-    .btn-outline{border:1px solid var(--border);background:#0b1220;padding:12px 14px;border-radius:12px;color:var(--text);cursor:pointer}
-    .banner{background:#0b2a1a;border:1px solid #134e31;border-radius:12px;padding:10px 12px;margin:8px 0 0;color:#b7f7d0;font-size:14px}
-    .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0b1220;border:1px solid var(--border);color:#e5e7eb;padding:10px 14px;border-radius:10px;display:none}
-    /* Modal QR */
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
-    .modal .box{background:#0b1220;border:1px solid var(--border);border-radius:16px;padding:18px;width:min(92vw,420px)}
-    .modal .qr{display:flex;align-items:center;justify-content:center;padding:16px;background:#0b1220;border-radius:12px;border:1px dashed #334155}
-    .modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+    body{ font-family: system-ui, -apple-system, Segoe UI, Roboto; margin:24px; background:#0b0b0b; color:#eee; }
+    .card{ max-width:720px; padding:20px; border-radius:16px; border:1px solid #222; background:#111; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+    label{ display:block; margin:12px 0 6px; font-weight:600; }
+    input{ width:100%; padding:12px; border-radius:12px; border:1px solid #333; background:#1a1a1a; color:#eee; }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; }
+    .col{ flex:1; min-width:220px; }
+    button{ padding:12px 16px; border:none; border-radius:12px; cursor:pointer; margin-right:8px; }
+    .btn-primary{ background:#4f46e5; color:#fff; }
+    .btn-secondary{ background:#334155; color:#fff; }
+    .out{ margin-top:12px; padding:12px; border-radius:12px; border:1px dashed #333; background:#0b0b0b; word-break:break-all; }
+    .qr{ margin-top:16px; display:grid; place-items:center; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card" id="card">
-      <h1>Avalie seu atendimento</h1>
-      <p class="desc">Vendedor: selecione seu nome e o DAV. Gere o QR ou link para o cliente avaliar.</p>
+  <div class="card">
+    <h2>Gerar link/QR da Avaliação</h2>
+    <p style="opacity:.8">Uso interno. O cliente <b>não</b> avalia aqui.</p>
 
-      <div id="contextBanner" class="banner" style="display:none;"></div>
-
-      <form id="form" novalidate>
-        <!-- Área do vendedor -->
-        <div class="row two" id="vendorRow">
-          <div>
-            <label for="colaborador">Quem te atendeu?</label>
-            <select id="colaborador" name="colaborador" required>
-              <option value="" selected disabled>Selecione o colaborador</option>
-              <option>Lucas</option>
-              <option>Cristian</option>
-              <option>José Neto</option>
-              <option>Augusto</option>
-            </select>
-          </div>
-          <div>
-            <label for="dav">Número DAV/DAVOS</label>
-            <input id="dav" name="dav" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="ex.: 12345 (somente números)" maxlength="20" autocomplete="off" required />
-          </div>
-        </div>
-
-        <!-- Ferramentas: gerar QR / link -->
-        <div id="vendorTools" class="vendor-tools">
-          <button type="button" class="btn-outline" id="btnQR">Gerar QR Code</button>
-          <button type="button" class="btn-outline" id="btnLink">Copiar link</button>
-        </div>
-
-        <!-- Área do cliente (avaliação) -->
-        <div class="group" id="grp-atendimento">
-          <div class="group-title">
-            <label>Avalie o <strong>atendimento</strong></label>
-            <span class="hint" id="hint-at">Toque em um emoji</span>
-          </div>
-          <div class="emoji-row" role="radiogroup" aria-label="Avaliação do atendimento">
-            <button type="button" class="emoji" data-field="atendimento" data-value="1" aria-checked="false" aria-label="Muito insatisfeito">😡</button>
-            <button type="button" class="emoji" data-field="atendimento" data-value="2" aria-checked="false" aria-label="Insatisfeito">😟</button>
-            <button type="button" class="emoji" data-field="atendimento" data-value="3" aria-checked="false" aria-label="Neutro">😐</button>
-            <button type="button" class="emoji" data-field="atendimento" data-value="4" aria-checked="false" aria-label="Satisfeito">🙂</button>
-            <button type="button" class="emoji" data-field="atendimento" data-value="5" aria-checked="false" aria-label="Muito satisfeito">😄</button>
-          </div>
-        </div>
-
-        <div>
-          <label for="sug_atendimento">Sugestões de melhoria do atendimento (opcional)</label>
-          <textarea id="sug_atendimento" name="sug_atendimento" placeholder="Conte como podemos melhorar o atendimento..."></textarea>
-        </div>
-
-        <div class="actions">
-          <button class="submit" id="submit" type="submit">Enviar anonimamente</button>
-          <span class="privacy">Não coletamos nome, e-mail ou telefone.</span>
-          <button id="installBtn" type="button" class="btn-outline" style="display:none;">Instalar no celular</button>
-          <footer>© App de Satisfação – simples e anônimo.</footer>
-        </div>
-      </form>
-
-      <div id="success" class="success" style="display:none;">
-        <h2>✅ Obrigado!</h2>
-        <p>Recebemos sua avaliação. Ela ajuda a melhorar nosso atendimento.</p>
-        <p><a href="#" id="new">Enviar outra resposta</a></p>
+    <div class="row">
+      <div class="col">
+        <label>Nome do vendedor</label>
+        <input id="vendedor" placeholder="Ex.: Maria Santos" />
+      </div>
+      <div class="col">
+        <label>Nº DAV / OS</label>
+        <input id="dav" placeholder="Ex.: 123456" />
       </div>
     </div>
-  </div>
 
-  <!-- Modal do QR -->
-  <div id="qrModal" class="modal" aria-hidden="true">
-    <div class="box">
-      <h3>Escaneie o QR code</h3>
-      <div id="qrContainer" class="qr"></div>
-      <p id="qrLinkText" style="word-break:break-all;font-size:12px;color:#9ca3af;margin:8px 0 0;"></p>
-      <div class="row">
-        <button type="button" class="btn-outline" id="btnPrint">Imprimir</button>
-        <button type="button" class="submit" id="btnCloseQR">Fechar</button>
+    <div class="row">
+      <div class="col">
+        <label>Máx. de respostas por link</label>
+        <input id="max" type="number" min="1" value="1" />
+      </div>
+      <div class="col">
+        <label>Validade (minutos)</label>
+        <input id="exp" type="number" min="5" value="1440" />
       </div>
     </div>
-  </div>
 
-  <div id="toast" class="toast">Link copiado!</div>
+    <div style="margin-top:16px">
+      <button class="btn-primary" onclick="gerar('link')">Gerar link</button>
+      <button class="btn-secondary" onclick="gerar('qr')">Gerar QR</button>
+    </div>
+
+    <div id="saida" class="out" style="display:none"></div>
+    <div id="qr" class="qr"></div>
+  </div>
 
   <script>
-    // COLE AQUI sua URL /exec do Apps Script:
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwKckYUBdIt3Sv4uY7DUxEK0KCzWpeItHv_TEwuXNZzWmjgYLwxh4-j2OjJfyOqikAH2w/exec";
+    const baseUrl = "<?= baseUrl ?>";
 
-    // Estado da avaliação
-    const state = { atendimento: 0 };
-
-    // Seleção de emoji
-    function selectEmoji(field, value, btn) {
-      state[field] = value;
-      const group = btn.parentElement;
-      group.querySelectorAll('.emoji').forEach(el => {
-        el.classList.remove('selected'); el.setAttribute('aria-checked','false');
-      });
-      btn.classList.add('selected'); btn.setAttribute('aria-checked','true');
-      document.getElementById('hint-at').textContent = `Nota: ${value}/5`;
-      validateReady();
-    }
-    document.querySelectorAll('.emoji').forEach(btn => {
-      btn.addEventListener('click', () => selectEmoji(btn.dataset.field, Number(btn.dataset.value), btn));
-    });
-
-    // Habilitar/desabilitar botões
-    const submitBtn = document.getElementById('submit');
-    function validateReady() {
-      const colabOK = document.getElementById('colaborador').value !== '';
-      const scoreOK = state.atendimento > 0;
-      const davOK = document.getElementById('dav').value.trim() !== '';
-      submitBtn.disabled = !(colabOK && scoreOK);
-      document.getElementById('btnQR').disabled = !(colabOK && davOK);
-      document.getElementById('btnLink').disabled = !(colabOK && davOK);
-    }
-    document.getElementById('colaborador').addEventListener('change', validateReady);
-    const davInput = document.getElementById('dav');
-    davInput.addEventListener('input', () => {
-      davInput.value = davInput.value.replace(/\D+/g, ''); // só dígitos
-      validateReady();
-    });
-    validateReady();
-
-    // PWA install
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(console.error);
-      });
-    }
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'inline-flex';
-    });
-    installBtn?.addEventListener('click', async () => {
-      if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; installBtn.style.display='none';
-    });
-
-    // Monta link com ?c=<colaborador>&dav=<n>
-    function buildShareLink() {
-      const base = new URL(location.href);
-      base.search = ''; // limpa params anteriores
-      const col = document.getElementById('colaborador').value;
+    function gerar(tipo){
+      const vendedor = document.getElementById('vendedor').value.trim();
       const dav = document.getElementById('dav').value.trim();
-      if (col) base.searchParams.set('c', col);
-      if (dav) base.searchParams.set('dav', dav);
-      return base.toString();
-    }
+      const max = parseInt(document.getElementById('max').value || '1', 10);
+      const exp = parseInt(document.getElementById('exp').value || '1440', 10);
 
-    // Botões de vendedor
-    const toast = document.getElementById('toast');
-    function showToast(msg){ toast.textContent=msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none',1800); }
+      if(!vendedor || !dav){ alert('Preencha vendedor e DAV.'); return; }
 
-    document.getElementById('btnLink').addEventListener('click', async () => {
-      const link = buildShareLink();
-      try { await navigator.clipboard.writeText(link); showToast('Link copiado!'); }
-      catch { showToast('Copie manualmente: ' + link); }
-      // Web Share API (opcional)
-      if (navigator.share) {
-        try { await navigator.share({ title: 'Avalie seu atendimento', url: link }); } catch {}
-      }
-    });
+      google.script.run.withSuccessHandler(function(res){
+        const out = document.getElementById('saida');
+        out.style.display = 'block';
+        out.textContent = res.url;
 
-    const qrModal = document.getElementById('qrModal');
-    const qrContainer = document.getElementById('qrContainer');
-    const qrLinkText = document.getElementById('qrLinkText');
-
-    document.getElementById('btnQR').addEventListener('click', () => {
-      const link = buildShareLink();
-      qrContainer.innerHTML = '';
-      // gera QR (tamanho 256px aprox)
-      const qr = new QRCode(qrContainer, { text: link, width: 256, height: 256 });
-      qrLinkText.textContent = link;
-      qrModal.style.display = 'flex'; qrModal.setAttribute('aria-hidden','false');
-    });
-    document.getElementById('btnCloseQR').addEventListener('click', () => {
-      qrModal.style.display = 'none'; qrModal.setAttribute('aria-hidden','true');
-      qrContainer.innerHTML = '';
-    });
-    document.getElementById('btnPrint').addEventListener('click', () => {
-      const img = qrContainer.querySelector('img,canvas');
-      const w = window.open('', '_blank');
-      w.document.write('<html><head><title>QR Code</title></head><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui,sans-serif">');
-      w.document.write('<div style="text-align:center">');
-      if (img) w.document.write(img.outerHTML);
-      w.document.write('<p style="margin-top:10px;font-size:14px;">'+qrLinkText.textContent+'</p>');
-      w.document.write('</div></body></html>');
-      w.document.close(); w.focus(); w.print();
-    });
-
-    // Modo cliente: se veio com ?c= & dav= na URL, pré-preenche e trava os campos; esconde as ferramentas do vendedor
-    (function prefillFromParams(){
-      const params = new URLSearchParams(location.search);
-      const col = params.get('c') || params.get('colaborador');
-      const dav = params.get('dav');
-      let banner = [];
-      if (col) {
-        const sel = document.getElementById('colaborador');
-        [...sel.options].forEach(o => { if (o.text.toLowerCase() === col.toLowerCase()) o.selected = true; });
-        sel.disabled = true; banner.push('Colaborador: ' + col);
-      }
-      if (dav) {
-        davInput.value = (dav+'').replace(/\D+/g,'');
-        davInput.readOnly = true; banner.push('DAV: ' + davInput.value);
-      }
-      if (banner.length) {
-        document.getElementById('contextBanner').textContent = 'Você está avaliando: ' + banner.join(' • ');
-        document.getElementById('contextBanner').style.display = 'block';
-        document.getElementById('vendorTools').style.display = 'none';
-      }
-      validateReady();
-    })();
-
-    // Envio (igual antes)
-    const form = document.getElementById('form');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault(); validateReady(); if (submitBtn.disabled) return;
-      const originalText = submitBtn.textContent; submitBtn.disabled = true; submitBtn.textContent = 'Enviando...';
-
-      const data = new URLSearchParams();
-      data.append('colaborador', document.getElementById('colaborador').value);
-      data.append('dav', document.getElementById('dav').value.trim());
-      data.append('atendimento_rating', String(state.atendimento));
-      data.append('sug_atendimento', document.getElementById('sug_atendimento').value.trim());
-      data.append('ua', navigator.userAgent);
-      data.append('pageUrl', location.href);
-      data.append('tz', Intl.DateTimeFormat().resolvedOptions().timeZone || '');
-
-      try {
-        const resp = await fetch(APPS_SCRIPT_URL, {
-          method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
-          body:data.toString()
-        });
-        const status = resp.status; let raw = await resp.text(); let ok = resp.ok, js = {};
-        try { js = JSON.parse(raw); ok = ok && (js.ok === true || js.status === 'success'); } catch {}
-        if (ok) {
-          document.getElementById('form').style.display = 'none';
-          document.getElementById('success').style.display = 'block';
-          document.getElementById('new').addEventListener('click', (ev) => {
-            ev.preventDefault();
-            document.getElementById('form').reset(); state.atendimento = 0;
-            document.querySelectorAll('.emoji.selected').forEach(b=>b.classList.remove('selected'));
-            document.querySelectorAll('.emoji').forEach(b=>b.setAttribute('aria-checked','false'));
-            document.getElementById('hint-at').textContent = 'Toque em um emoji';
-            document.getElementById('success').style.display = 'none';
-            document.getElementById('form').style.display = 'block';
-            // reexibe ferramentas do vendedor só se não houver ?c&dav
-            if (!new URLSearchParams(location.search).has('c') && !new URLSearchParams(location.search).has('dav')) {
-              document.getElementById('vendorTools').style.display = 'flex';
-              document.getElementById('contextBanner').style.display = 'none';
-              document.getElementById('colaborador').disabled = false;
-              document.getElementById('dav').readOnly = false;
-            }
-            validateReady();
-          }, { once: true });
+        if (tipo === 'qr') {
+          document.getElementById('qr').innerHTML = '<img src="'+res.qr+'" width="240" height="240" alt="QR">';
         } else {
-          if (js && (js.code === 'DUPLICATE_DAV' || /DAV.*avaliad/i.test(js.error||''))) {
-            alert('Este número DAV/DAVOS já foi avaliado. Obrigado!');
-          } else {
-            alert(`Não foi possível enviar. (HTTP ${status})` + (js.error ? `\nErro do servidor: ${js.error}` : ''));
-            console.log('Apps Script resposta:', status, raw);
-          }
+          document.getElementById('qr').innerHTML = '';
         }
-      } catch (err) {
-        alert('Erro de conexão. Verifique a internet e tente novamente.');
-        console.error(err);
-      } finally {
-        submitBtn.textContent = originalText; submitBtn.disabled = false;
-      }
-    });
+      }).withFailureHandler(function(err){
+        alert((err && err.message) ? err.message : err);
+      }).gerarConvite(vendedor, dav, max, exp);
+    }
   </script>
 </body>
 </html>
+

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Avaliação</title>
+  <style>
+    body{ font-family: system-ui, -apple-system, Segoe UI, Roboto; margin:24px; background:#0b0b0b; color:#eee; }
+    .card{ max-width:720px; padding:20px; border-radius:16px; border:1px solid #222; background:#111; margin:0 auto; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+    .nota{ display:flex; gap:8px; }
+    .nota button{ flex:1; padding:16px; border:none; border-radius:12px; background:#1f2937; color:#fff; font-size:18px; cursor:pointer; }
+    .nota button.sel{ outline:3px solid #4f46e5; }
+    textarea{ width:100%; min-height:120px; padding:12px; border-radius:12px; border:1px solid #333; background:#1a1a1a; color:#eee; }
+    .btn{ width:100%; padding:12px 16px; border:none; border-radius:12px; background:#4f46e5; color:#fff; font-size:16px; cursor:pointer; }
+    .muted{ opacity:.8; }
+    .error{ color:#ef4444; font-weight:600; }
+    .success{ color:#22c55e; font-weight:600; }
+  </style>
+</head>
+<body>
+  <div class="card" id="conteudo">
+    <h2>Avaliação do atendimento</h2>
+    <p class="muted">Esta página só abre via link/QR enviado.</p>
+    <p id="info" class="muted"></p>
+    <div id="bloqueio" class="error"></div>
+
+    <div style="margin-top:12px">
+      <label>Escolha uma nota:</label>
+      <div class="nota" id="nota">
+        <button onclick="selNota(1)">1</button>
+        <button onclick="selNota(2)">2</button>
+        <button onclick="selNota(3)">3</button>
+        <button onclick="selNota(4)">4</button>
+        <button onclick="selNota(5)">5</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label>Comentário (opcional)</label>
+      <textarea id="obs" placeholder="Escreva sua sugestão/elogio..."></textarea>
+    </div>
+
+    <div style="margin-top:12px">
+      <button class="btn" onclick="enviar()">Enviar</button>
+    </div>
+    <div id="status" style="margin-top:12px"></div>
+  </div>
+
+  <script>
+    const token = "<?= token ?>";
+    let notaSel = null;
+
+    function selNota(n){
+      notaSel = n;
+      const bs = document.querySelectorAll('#nota button');
+      bs.forEach(b => b.classList.remove('sel'));
+      bs[n-1].classList.add('sel');
+    }
+
+    function bloquear(msg){
+      document.getElementById('conteudo').innerHTML = '<h2>Avaliação</h2><p class="error">'+msg+'</p>';
+    }
+
+    window.addEventListener('load', function(){
+      if(!token){ bloquear('Link inválido.'); return; }
+      google.script.run.withSuccessHandler(function(res){
+        if(!res.ok){ bloquear(res.motivo || 'Token inválido.'); return; }
+        document.getElementById('info').innerHTML = 'Atendimento de <b>'+res.vendedor+'</b> • DAV/OS <b>'+res.dav+'</b>';
+      }).withFailureHandler(function(){
+        bloquear('Erro ao validar link.');
+      }).validarToken(token);
+    });
+
+    function enviar(){
+      if(!notaSel){ document.getElementById('status').innerHTML = '<span class="error">Escolha uma nota.</span>'; return; }
+      const obs = document.getElementById('obs').value || "";
+      const ua = navigator.userAgent;
+
+      google.script.run.withSuccessHandler(function(){
+        document.getElementById('status').innerHTML = '<span class="success">Obrigado! Sua avaliação foi registrada.</span>';
+        document.querySelectorAll('button,textarea').forEach(el => el.disabled = true);
+      }).withFailureHandler(function(err){
+        document.getElementById('status').innerHTML = '<span class="error">'+((err && err.message) ? err.message : 'Falha ao enviar.')+'</span>';
+      }).enviarAvaliacao(token, notaSel, obs, ua);
+    }
+  </script>
+</body>
+</html>
+
